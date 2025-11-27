@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Client</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+    #log { white-space: pre-wrap; background: #fff; padding: 10px; border: 1px solid #ccc; height: 400px; overflow-y: scroll; }
+    .connected { color: green; }
+    .disconnected { color: red; }
+    .error { color: orange; }
+  </style>
+</head>
+<body>
+  <h1>WebSocket Client</h1>
+  <div id="log"></div>
+
+  <script>
+    const logDiv = document.getElementById('log');
+
+    function log(message, type = '') {
+      const p = document.createElement('p');
+      p.textContent = message;
+      if(type) p.classList.add(type);
+      logDiv.appendChild(p);
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    const url = "wss://broadcaster.pragmaticplaylive.net/broadcast?JSESSIONID=K0q7ydbBcmaLgmvDyXg2e3gbucxUV5B3s3LKN1bK06hvM-qjaKjZ!93527088-b4572d18&tableId=haphflyer2201jfm&type=json";
+    
+    const ws = new WebSocket(url);
+
+    ws.onopen = () => {
+      log("CONNECTED ✓", "connected");
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        log("EVENT: " + JSON.stringify(data, null, 2));
+      } catch {
+        log("RAW: " + event.data);
+      }
+    };
+
+    ws.onclose = () => {
+      log("DISCONNECTED ✗", "disconnected");
+    };
+
+    ws.onerror = (err) => {
+      log("ERROR: " + err.message, "error");
+    };
+  </script>
+</body>
+</html>
